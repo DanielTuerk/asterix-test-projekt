@@ -1,0 +1,13 @@
+<configuration>
+    <appender name="KONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss} %-5level %logger{25} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Ohne diese Zeile loggt Logback per Default auf DEBUG - die Docker-Kommunikation
+         waere dann kaum zu lesen. -->
+    <root level="INFO">
+        <appender-ref ref="KONSOLE"/>
+    </root>
+</configuration>

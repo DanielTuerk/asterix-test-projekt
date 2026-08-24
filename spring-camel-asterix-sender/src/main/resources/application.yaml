@@ -1,0 +1,31 @@
+asterix:
+  target:
+    # Gegenstueck zum Default des spring-camel-asterix-receiver.
+    # udpByteArrayCodec=true sorgt dafuer, dass das byte[] roh im Datagramm landet.
+    uri: "netty:udp://127.0.0.1:8600?sync=false&udpByteArrayCodec=true"
+  sender:
+    # Takt, in dem ein Plot erzeugt wird.
+    period-millis: 1000
+    # Kennung des simulierten Radars (I048/010)
+    sac: 25
+    sic: 11
+    # Eigenschaften des simulierten Ziels
+    mode3a-code: 7000
+    flight-level: 300.0
+
+spring:
+  application:
+    name: asterix-sender
+  main:
+    # Kein Web-Server: Camel haelt die Anwendung am Leben.
+    web-application-type: none
+
+camel:
+  main:
+    name: asterix-sender
+    # Haelt die JVM am Leben, solange der Camel-Kontext laeuft.
+    main-run-controller: true
+
+logging:
+  level:
+    dtuerk.asterix: INFO

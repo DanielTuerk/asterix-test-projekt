@@ -1,0 +1,39 @@
+asterix:
+  source:
+    # Standard: UDP-Unicast auf allen Interfaces, Port 8600.
+    # udpByteArrayCodec=true ist wichtig - sonst versucht Netty, Java-Serialisierung zu dekodieren.
+    uri: "netty:udp://0.0.0.0:8600?sync=false&udpByteArrayCodec=true&receiveBufferSize=65535"
+    #
+    # Alternative 1 - UDP-Multicast (so kommt ASTERIX im Betrieb meist an):
+    # uri: "netty:udp://239.192.0.1:8600?sync=false&udpByteArrayCodec=true&networkInterface=Ethernet"
+    #
+    # Alternative 2 - Wiedergabe aufgezeichneter Bloecke aus Dateien (kein Live-Feed noetig):
+    # uri: "file:data/asterix?include=.*\.(ast|bin)&noop=true&readLock=none"
+
+  kafka:
+    # Broker aus dem Testcontainers-Setup (Modul asterix-infra) oder ein lokaler Broker.
+    brokers: "localhost:9092"
+    topic: "asterix-raw"
+
+  sink:
+    # Ziel nach dem Log. Die ${...} loest schon Spring auf, Camel sieht die fertige URI.
+    # ByteArraySerializer ist Pflicht: Camels Default ist der StringSerializer, der an
+    # rohen ASTERIX-Bytes scheitert.
+    uri: "kafka:${asterix.kafka.topic}?brokers=${asterix.kafka.brokers}&valueSerializer=org.apache.kafka.common.serialization.ByteArraySerializer"
+
+spring:
+  application:
+    name: asterix-receiver
+  main:
+    # Kein Web-Server: Camel haelt die Anwendung am Leben.
+    web-application-type: none
+
+camel:
+  main:
+    name: asterix-receiver
+    # Haelt die JVM am Leben, solange der Camel-Kontext laeuft.
+    main-run-controller: true
+
+logging:
+  level:
+    dtuerk.asterix: INFO

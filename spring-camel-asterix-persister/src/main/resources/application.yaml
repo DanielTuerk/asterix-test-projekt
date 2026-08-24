@@ -1,0 +1,44 @@
+asterix:
+  kafka:
+    # Broker aus dem Testcontainers-Setup (Modul asterix-infra) oder ein lokaler Broker.
+    brokers: "localhost:9092"
+    topic: "asterix-raw"
+    group-id: "asterix-persister"
+
+  source:
+    # Quelle: dasselbe Topic, auf das der Receiver schreibt.
+    # ByteArrayDeserializer ist Pflicht, sonst versucht Camel, die Rohbytes als String zu lesen.
+    # autoOffsetReset=earliest holt beim ersten Start auch schon liegende Bloecke ab.
+    uri: "kafka:${asterix.kafka.topic}?brokers=${asterix.kafka.brokers}&groupId=${asterix.kafka.group-id}&autoOffsetReset=earliest&valueDeserializer=org.apache.kafka.common.serialization.ByteArrayDeserializer"
+
+  sink:
+    # Ziel: ein INSERT je Block. :#name sind die benannten Parameter von camel-sql; sie werden
+    # aus der Map im Body befuellt (siehe AsterixPersisterRoute#toSqlParameters).
+    # Camel ersetzt das # intern durch ?, damit es nicht mit dem URI-Trenner kollidiert.
+    uri: "sql:INSERT INTO asterix_raw (stored_at, kafka_timestamp, kafka_topic, kafka_partition, kafka_offset, payload) VALUES (:#stored_at, :#kafka_timestamp, :#kafka_topic, :#kafka_partition, :#kafka_offset, :#payload)"
+
+spring:
+  application:
+    name: asterix-persister
+  main:
+    # Kein Web-Server: Camel haelt die Anwendung am Leben.
+    web-application-type: none
+  datasource:
+    # PostgreSQL aus dem Testcontainers-Setup (Modul asterix-infra).
+    url: "jdbc:postgresql://localhost:5432/asterix"
+    username: "asterix"
+    password: "asterix"
+  sql:
+    init:
+      # Legt asterix_raw beim Start an, falls die Tabelle noch fehlt.
+      mode: always
+
+camel:
+  main:
+    name: asterix-persister
+    # Haelt die JVM am Leben, solange der Camel-Kontext laeuft.
+    main-run-controller: true
+
+logging:
+  level:
+    dtuerk.asterix: INFO
