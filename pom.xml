@@ -12,18 +12,20 @@
     </parent>
 
     <groupId>dtuerk</groupId>
-    <artifactId>asterix-test-projekt</artifactId>
+    <artifactId>camel-test-projekt</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>asterix-test-projekt</name>
-    <description>Einarbeitung in EUROCONTROL ASTERIX und Apache Camel</description>
+    <name>camel-test-projekt</name>
+    <description>Einarbeitung in EUROCONTROL ASTERIX/ADEXP und Apache Camel</description>
 
     <modules>
-        <module>asterix-common</module>
-        <module>asterix-infra</module>
-        <module>spring-camel-asterix-sender</module>
+        <module>common</module>
+        <module>infra</module>
+        <module>spring-camel-data-sender</module>
         <module>spring-camel-asterix-receiver</module>
         <module>spring-camel-asterix-persister</module>
+        <module>spring-camel-adexp-receiver</module>
+        <module>spring-camel-adexp-persister</module>
     </modules>
 
     <properties>

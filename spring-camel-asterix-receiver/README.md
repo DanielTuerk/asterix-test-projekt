@@ -12,7 +12,7 @@ unveraendert auf ein Kafka-Topic.
 | `AsterixReceiverRoute` | die Camel-Route: `from(udp) -> loggen -> to(kafka)` |
 | `application.yaml` | Quelle (UDP-Unicast, UDP-Multicast oder Datei) und Kafka-Ziel |
 
-Der `HexDump` liegt im Modul [asterix-common](../asterix-common), weil der Persister ihn
+Der `HexDump` liegt im Modul [asterix-common](../common), weil der Persister ihn
 ebenfalls benutzt.
 
 Die Route in Kurzform:

@@ -1,4 +1,4 @@
-asterix:
+adexp:
   source:
     # Standard: UDP-Unicast auf allen Interfaces, Port 8600.
     # udpByteArrayCodec=true ist wichtig - sonst versucht Netty, Java-Serialisierung zu dekodieren.
@@ -13,24 +13,26 @@ asterix:
   kafka:
     # Broker aus dem Testcontainers-Setup (Modul asterix-infra) oder ein lokaler Broker.
     brokers: "localhost:9092"
-    topic: "asterix-raw"
+    topic: "adexp-raw"
 
   sink:
     # Ziel nach dem Log. Die ${...} loest schon Spring auf, Camel sieht die fertige URI.
     # ByteArraySerializer ist Pflicht: Camels Default ist der StringSerializer, der an
     # rohen ASTERIX-Bytes scheitert.
-    uri: "kafka:${asterix.kafka.topic}?brokers=${asterix.kafka.brokers}&valueSerializer=org.apache.kafka.common.serialization.ByteArraySerializer"
+    ifpl:
+      topic: "adexp-ifpl"
+      uri: "kafka:${adexp.sink.ifpl.topic}?brokers=${adexp.kafka.brokers}&valueSerializer=org.apache.kafka.common.serialization.ByteArraySerializer"
 
 spring:
   application:
-    name: asterix-receiver
+    name: adexp-receiver
   main:
     # Kein Web-Server: Camel haelt die Anwendung am Leben.
     web-application-type: none
 
 camel:
   main:
-    name: asterix-receiver
+    name: adexp-receiver
     # Haelt die JVM am Leben, solange der Camel-Kontext laeuft.
     main-run-controller: true
 

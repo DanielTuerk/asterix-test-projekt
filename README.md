@@ -1,4 +1,4 @@
-# asterix-test-projekt
+# camel-test-projekt
 
 Spielwiese zur Einarbeitung in **EUROCONTROL ASTERIX** und **Apache Camel**.
 Maven-Reactor mit Spring Boot 4.1, Camel 4.22 und Java 21.

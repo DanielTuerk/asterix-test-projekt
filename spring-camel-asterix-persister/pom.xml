@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>dtuerk</groupId>
-        <artifactId>asterix-test-projekt</artifactId>
+        <artifactId>camel-test-projekt</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>dtuerk</groupId>
-            <artifactId>asterix-common</artifactId>
+            <artifactId>common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

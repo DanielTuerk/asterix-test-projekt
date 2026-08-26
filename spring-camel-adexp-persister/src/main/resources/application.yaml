@@ -1,0 +1,43 @@
+adexp:
+  kafka:
+    # Broker aus dem Testcontainers-Setup (Modul adexp-infra) oder ein lokaler Broker.
+    brokers: "localhost:9092"
+    group-id: "adexp-persister"
+
+  source:
+    ifpl:
+      topic: "adexp-ifpl"
+      uri: "kafka:${adexp.source.ifpl.topic}?brokers=${adexp.kafka.brokers}&groupId=${adexp.kafka.group-id}&autoOffsetReset=earliest&valueDeserializer=org.apache.kafka.common.serialization.ByteArrayDeserializer"
+
+  sink:
+    ifpl:
+      # Ziel: ein INSERT je Block. :#name sind die benannten Parameter von camel-sql; sie werden
+      # aus der Map im Body befuellt (siehe adexpPersisterRoute#toSqlParameters).
+      # Camel ersetzt das # intern durch ?, damit es nicht mit dem URI-Trenner kollidiert.
+      uri: "sql:INSERT INTO flight_plan (ifpl_id, title, arcid, adep, ades, arctyp, eobd, eobt, rfl, speed, route, origin_fac, addresses, route_points, eet_per_fir, raw_payload) VALUES (:#ifpl_id, :#title, :#arcid, :#adep, :#ades, :#arctyp, :#eobd, :#eobt, :#rfl, :#speed, :#route, :#origin_fac, CAST(:#addresses AS jsonb), CAST(:#route_points AS jsonb), CAST(:#eet_per_fir AS jsonb), :#raw_payload)"
+
+spring:
+  application:
+    name: adexp-persister
+  main:
+    # Kein Web-Server: Camel haelt die Anwendung am Leben.
+    web-application-type: none
+  datasource:
+    # PostgreSQL aus dem Testcontainers-Setup (Modul adexp-infra).
+    url: "jdbc:postgresql://localhost:5432/asterix"
+    username: "asterix"
+    password: "asterix"
+  sql:
+    init:
+      # Legt adexp_raw beim Start an, falls die Tabelle noch fehlt.
+      mode: always
+
+camel:
+  main:
+    name: adexp-persister
+    # Haelt die JVM am Leben, solange der Camel-Kontext laeuft.
+    main-run-controller: true
+
+logging:
+  level:
+    dtuerk.camel: DEBUG

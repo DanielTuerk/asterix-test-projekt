@@ -10,9 +10,11 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>spring-camel-asterix-receiver</artifactId>
-    <name>spring-camel-asterix-receiver</name>
-    <description>Spring Boot + Apache Camel: liest ASTERIX-Daten ein und loggt den Body</description>
+    <artifactId>spring-camel-adexp-persister</artifactId>
+    <name>spring-camel-adexp-persister</name>
+    <description>Spring Boot + Apache Camel: liest die Rohbloecke vom Kafka-Topic, loggt sie und schreibt sie nach
+        PostgreSQL
+    </description>
 
     <dependencies>
         <dependency>
@@ -24,22 +26,42 @@
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-spring-boot-starter</artifactId>
         </dependency>
-        <!-- UDP-Empfang (ASTERIX wird typischerweise per UDP/Multicast verteilt) -->
-        <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
-            <artifactId>camel-netty-starter</artifactId>
-        </dependency>
-
-        <!-- Weitergabe der Rohbloecke an Kafka -->
+        <!-- Quelle: das Kafka-Topic, auf das der Receiver schreibt -->
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-kafka-starter</artifactId>
         </dependency>
+        <!-- Ziel: INSERT per JDBC -->
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-sql-starter</artifactId>
+        </dependency>
+        <!-- Liefert DataSource + Ausfuehrung von schema.sql -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
-        <!-- Integrationstest: Kafka-Broker aus dem Container -->
+        <!-- Unit-Test: dieselbe Route gegen eine In-Memory-Datenbank, ohne Docker -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Integrationstest: echter Broker und echtes PostgreSQL aus Containern -->
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers-kafka</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-postgresql</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
