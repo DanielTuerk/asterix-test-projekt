@@ -11,10 +11,43 @@ adexp:
 
   sink:
     ifpl:
-      # Ziel: ein INSERT je Block. :#name sind die benannten Parameter von camel-sql; sie werden
-      # aus der Map im Body befuellt (siehe adexpPersisterRoute#toSqlParameters).
-      # Camel ersetzt das # intern durch ?, damit es nicht mit dem URI-Trenner kollidiert.
-      uri: "sql:INSERT INTO flight_plan (ifpl_id, title, arcid, adep, ades, arctyp, eobd, eobt, rfl, speed, route, origin_fac, addresses, route_points, eet_per_fir, raw_payload) VALUES (:#ifpl_id, :#title, :#arcid, :#adep, :#ades, :#arctyp, :#eobd, :#eobt, :#rfl, :#speed, :#route, :#origin_fac, CAST(:#addresses AS jsonb), CAST(:#route_points AS jsonb), CAST(:#eet_per_fir AS jsonb), :#raw_payload)"
+      uri: >
+        sql:INSERT INTO flight_plan (
+          ifpl_id,
+          title,
+          arcid,
+          adep,
+          ades,
+          arctyp,
+          eobd,
+          eobt,
+          rfl,
+          speed,
+          route,
+          origin_fac,
+          addresses,
+          route_points,
+          eet_per_fir,
+          raw_payload
+        ) VALUES (
+          :#ifpl_id,
+          :#title,
+          :#arcid,
+          :#adep,
+          :#ades,
+          :#arctyp,
+          :#eobd,
+          :#eobt,
+          :#rfl,
+          :#speed,
+          :#route,
+          :#origin_fac,
+          CAST(:#addresses AS jsonb),
+          CAST(:#route_points AS jsonb),
+          CAST(:#eet_per_fir AS jsonb),
+          :#raw_payload
+        )
+        ON CONFLICT (ifpl_id) DO NOTHING
 
 spring:
   application:

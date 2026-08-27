@@ -3,6 +3,7 @@ package dtuerk.camel.persister;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dtuerk.camel.common.FlightPlan;
 import org.apache.camel.Exchange;
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.kafka.KafkaConstants;
 import org.slf4j.Logger;
@@ -30,7 +31,14 @@ public class IfplPersisterRoute extends RouteBuilder {
                 // Baut die Parameter-Map fuer den INSERT; die Rohbytes wandern unveraendert
                 // als Wert von "payload" mit.
                 .process(this::toSqlParameters)
-                .to("{{adexp.sink.ifpl.uri}}");
+                .to("{{adexp.sink.ifpl.uri}}")
+                // check result
+                .choice()
+                .when(header("CamelSqlUpdateCount").isEqualTo(0))
+                .log(LoggingLevel.WARN, "IFPL ${body[ifplid]} existiert bereits")
+                .otherwise()
+                .log(LoggingLevel.INFO, "IFPL ${body[ifplid]} wurde gespeichert")
+                .end();
     }
 
     private void logBody(Exchange exchange) {

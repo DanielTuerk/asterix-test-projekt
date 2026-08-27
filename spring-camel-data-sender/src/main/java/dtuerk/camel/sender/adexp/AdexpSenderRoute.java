@@ -22,8 +22,8 @@ public class AdexpSenderRoute extends RouteBuilder {
                 .bean(FlightDataProvider.class, "buildRequest") // alternativ:  .setBody(simple("resource:classpath:templates/adexp-request-body.txt"))
                 .setHeader(Exchange.HTTP_METHOD, constant("PUT"))
                 .setHeader(Exchange.CONTENT_TYPE, constant("text/plain"))
-                .log(LoggingLevel.INFO, LOG, "Sende: ${body}")
+                .log(LoggingLevel.INFO, LOG, "send FLightPlan")
                 .to("{{adexp.target.uri}}")
-                .log("Antwort: ${body}");
+                .log("Response: ${body}");
     }
 }

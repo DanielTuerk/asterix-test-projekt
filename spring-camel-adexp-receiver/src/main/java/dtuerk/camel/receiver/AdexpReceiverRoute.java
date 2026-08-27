@@ -1,5 +1,6 @@
 package dtuerk.camel.receiver;
 
+import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ public class AdexpReceiverRoute extends RouteBuilder {
 
         from("direct:processAdexpMsg")
                 .routeId(ROUTE_ID)
-                .log("PUT empfangen für ARCID: ${header.arcid}, Body: ${body}")
+                .log("PUT empfangen für ARCID: ${header.arcid}")
                 .process(exchange -> {
                     String body = exchange.getIn().getBody(String.class);
                     String title = AdexpParser.peekTitle(body).orElse("UNKNOWN");
@@ -45,7 +46,12 @@ public class AdexpReceiverRoute extends RouteBuilder {
                 .otherwise()
                 .log(LoggingLevel.WARN, "Unbekannter ADEXP-Typ: ${header.HEADER_TITLE}")
                 .to("direct:handleUnknown")
-                .end();
+                .end()
+
+                // HTTP-Response
+                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(200))
+                .setHeader(Exchange.CONTENT_TYPE, constant("text/plain"))
+                .setBody(constant("OK"));
     }
 
 }

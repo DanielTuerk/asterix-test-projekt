@@ -18,11 +18,25 @@ public class IfplProcessingRoute extends RouteBuilder {
     public void configure() throws Exception {
         from("direct:handleIfpl")
                 .routeId(ROUTE_ID)
-                .log("handle IFPL message, Body: ${body}")
+                .log("handle IFPL message")
                 .convertBodyTo(String.class)
                 .convertBodyTo(FlightPlan.class)
                 .log("convert FlightPlan to FlightPlan: ${body}")
                 .marshal().json(JsonLibrary.Jackson)
+                /*
+                 * ON CONFLICT (ifplid):
+                 * Das ist nur richtig, wenn du bewusst ausschließlich die erste empfangene Version eines Flugplans speichern möchtest.
+                 *
+                 * Spätere Nachrichten könnten aber beispielsweise:
+                 *
+                 * geänderte Flugplandaten enthalten,
+                 * eine aktualisierte Route enthalten,
+                 * einen geänderten Flugzeugtyp oder Flight Level enthalten,
+                 * andere oder zusätzliche IFP-Hinweise enthalten,
+                 * denselben Flugplan erneut an deine ATC-Unit verteilen.
+                 *
+                 * EUROCONTROL beschreibt beispielsweise Folgeinformationen und Änderungen, die unter Angabe der IFPLID verarbeitet und an betroffene ATS Units verteilt werden
+                 */
                 .to("{{adexp.sink.ifpl.uri}}");
     }
 }
